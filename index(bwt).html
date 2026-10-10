@@ -1,0 +1,829 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neighborhood Issue Tracker</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f6fc;
+  color: #1e293b;
+}
+
+header {
+  background: #243b80;
+  color: white;
+  padding: 22px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+header h1 {
+  font-size: 25px;
+}
+
+header p {
+  font-size: 13px;
+  margin-top: 6px;
+  color: #dbe5ff;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.report-btn {
+  background: #fbbf24;
+  color: #172554;
+}
+
+.container {
+  width: 88%;
+  max-width: 1200px;
+  margin: 30px auto;
+}
+
+.welcome {
+  margin-bottom: 25px;
+}
+
+.welcome h2 {
+  font-size: 29px;
+  margin-bottom: 10px;
+}
+
+.welcome p {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px #1725540b;
+  border-bottom: 4px solid #4775ed;
+}
+
+.stat-card h3 {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.stat-card p {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.blue { border-color: #4775ed; }
+.green { border-color: #16a34a; }
+.orange { border-color: #f59e0b; }
+.red { border-color: #ef4444; }
+
+.content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.panel {
+  background: white;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 4px 15px #1725540b;
+  margin-bottom: 20px;
+}
+
+.panel h2 {
+  margin-bottom: 18px;
+  font-size: 20px;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+input, select, textarea {
+  padding: 12px;
+  border: 1px solid #d8dfeb;
+  border-radius: 8px;
+  font: inherit;
+  min-width: 0;
+  background: white;
+}
+
+.filters input {
+  flex: 1;
+  width: 150px;
+}
+
+.filters select {
+  flex: 1;
+  width: 130px;
+}
+
+.issue {
+  border: 1px solid #e2e8f0;
+  padding: 17px;
+  border-radius: 11px;
+  margin-bottom: 13px;
+}
+
+.issue h3 {
+  font-size: 16px;
+  margin-bottom: 9px;
+}
+
+.issue p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.issue-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 13px;
+}
+
+.badge {
+  padding: 6px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.pending {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.progress {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.resolved {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.priority {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.update-btn {
+  background: #e0e7ff;
+  color: #243b80;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.steps p {
+  margin: 14px 0;
+  line-height: 1.6;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.steps strong {
+  color: #1e293b;
+}
+
+.tip {
+  background: #eff6ff;
+  padding: 15px;
+  border-radius: 10px;
+  color: #1e40af;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* Report form popup */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #0f172ab8;
+  z-index: 10;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.close {
+  background: #e2e8f0;
+  padding: 6px 12px;
+  height: 35px;
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+}
+
+.field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.submit-btn {
+  background: #243b80;
+  color: white;
+}
+
+.cancel-btn {
+  background: #e2e8f0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+
+#message {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #166534;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  z-index: 20;
+  max-width: 90%;
+  text-align: center;
+}
+
+@media (max-width: 850px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  header {
+    padding: 20px;
+  }
+
+  header h1 {
+    font-size: 20px;
+  }
+
+  .container {
+    width: 92%;
+    margin-top: 22px;
+  }
+
+  .welcome h2 {
+    font-size: 24px;
+  }
+
+  .stats {
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-card p {
+    font-size: 27px;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  .full, .form-actions {
+    grid-column: 1;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div>
+    <h1>🏘️ Neighborhood Issue Tracker</h1>
+    <p>Report problems. Track progress. Improve your community.</p>
+  </div>
+  <button class="report-btn" onclick="openForm()">
+    + Report an Issue
+  </button>
+</header>
+
+<main class="container">
+
+  <section class="welcome">
+    <h2>Community Dashboard 👋</h2>
+    <p>
+      Welcome to your neighborhood portal. Report local problems
+      and follow their progress toward resolution.
+    </p>
+  </section>
+
+  <section class="stats">
+    <div class="stat-card blue">
+      <h3>Total Issues</h3>
+      <p id="total">6</p>
+    </div>
+
+    <div class="stat-card green">
+      <h3>Resolved</h3>
+      <p id="resolved">2</p>
+    </div>
+
+    <div class="stat-card orange">
+      <h3>In Progress</h3>
+      <p id="inProgress">2</p>
+    </div>
+
+    <div class="stat-card red">
+      <h3>Pending</h3>
+      <p id="pending">2</p>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="panel">
+      <h2>📋 Reported Issues</h2>
+
+      <div class="filters">
+        <input
+          type="search"
+          id="search"
+          placeholder="Search issues or location..."
+          oninput="renderIssues()"
+        >
+
+        <select id="filter" onchange="renderIssues()">
+          <option value="All">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Resolved">Resolved</option>
+        </select>
+      </div>
+
+      <div id="issues"></div>
+    </div>
+
+    <aside>
+      <div class="panel steps">
+        <h2>💡 How It Works</h2>
+
+        <p><strong>1. Report an issue</strong><br>
+        Submit details about a local problem.</p>
+
+        <p><strong>2. Track its status</strong><br>
+        Follow the progress of your complaint.</p>
+
+        <p><strong>3. Improve the community</strong><br>
+        Help make your neighborhood cleaner and safer.</p>
+      </div>
+
+      <div class="panel">
+        <h2>🌱 Community Impact</h2>
+        <p style="color:#64748b; margin-bottom:12px">
+          Percentage of reports resolved
+        </p>
+
+        <div style="background:#e2e8f0;border-radius:20px;height:12px;overflow:hidden">
+          <div id="bar" style="width:33%;height:100%;background:#16a34a"></div>
+        </div>
+
+        <p id="rate" style="margin-top:10px;font-weight:bold">33% resolved</p>
+
+        <div class="tip" style="margin-top:20px">
+          💬 <strong>Community Tip</strong><br>
+          Provide clear locations and descriptions to help
+          authorities identify problems faster.
+        </div>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<footer>
+  Neighborhood Issue Tracker | Community Improvement Project
+</footer>
+
+<!-- Report Issue Modal -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h2>Report an Issue</h2>
+        <p style="color:#64748b;font-size:13px;margin-top:6px">
+          Enter the details below.
+        </p>
+      </div>
+      <button class="close" onclick="closeForm()">✕</button>
+    </div>
+
+    <form id="issueForm">
+      <div class="field full">
+        <label for="title">Issue Title *</label>
+        <input id="title" required maxlength="100"
+          placeholder="e.g. Broken streetlight">
+      </div>
+
+      <div class="field">
+        <label for="category">Category *</label>
+        <select id="category" required>
+          <option value="">Select category</option>
+          <option>Roads & Potholes</option>
+          <option>Waste Management</option>
+          <option>Street Lighting</option>
+          <option>Water & Drainage</option>
+          <option>Public Safety</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="priority">Priority</label>
+        <select id="priority">
+          <option>Low</option>
+          <option selected>Medium</option>
+          <option>High</option>
+          <option>Urgent</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label for="location">Location *</label>
+        <input id="location" required maxlength="120"
+          placeholder="Street name or nearby landmark">
+      </div>
+
+      <div class="field full">
+        <label for="description">Description *</label>
+        <textarea id="description" required maxlength="500"
+          placeholder="Describe the issue in detail..."></textarea>
+      </div>
+
+      <div class="field full">
+        <label for="reporter">Your Name (Optional)</label>
+        <input id="reporter" maxlength="50"
+          placeholder="Enter your name">
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" onclick="closeForm()">
+          Cancel
+        </button>
+        <button type="submit" class="submit-btn">
+          Submit Report
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="message" role="status"></div>
+
+<script>
+const startingIssues = [
+  {
+    id: 1,
+    title: "Large pothole on Main Road",
+    category: "Roads & Potholes",
+    location: "Main Road, near City Park",
+    description: "A large pothole is causing difficulty for vehicles.",
+    priority: "High",
+    status: "In Progress"
+  },
+  {
+    id: 2,
+    title: "Overflowing garbage bin",
+    category: "Waste Management",
+    location: "Market Street",
+    description: "Waste is overflowing from the public garbage bin.",
+    priority: "Medium",
+    status: "Pending"
+  },
+  {
+    id: 3,
+    title: "Broken streetlight",
+    category: "Street Lighting",
+    location: "Lake View Road",
+    description: "The streetlight is not working at night.",
+    priority: "High",
+    status: "In Progress"
+  },
+  {
+    id: 4,
+    title: "Water leakage near apartments",
+    category: "Water & Drainage",
+    location: "Green Residency",
+    description: "Water is leaking continuously from a roadside pipe.",
+    priority: "Urgent",
+    status: "Pending"
+  },
+  {
+    id: 5,
+    title: "Park pathway repaired",
+    category: "Other",
+    location: "Sunrise Park",
+    description: "The damaged walking path has been repaired.",
+    priority: "Low",
+    status: "Resolved"
+  },
+  {
+    id: 6,
+    title: "Blocked drainage cleared",
+    category: "Water & Drainage",
+    location: "4th Cross Road",
+    description: "The blocked drain has been cleaned.",
+    priority: "Medium",
+    status: "Resolved"
+  }
+];
+
+let issues = startingIssues.map(issue => ({...issue}));
+
+function safeText(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function openForm() {
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeForm() {
+  document.getElementById("modal").style.display = "none";
+}
+
+function showMessage(text) {
+  const message = document.getElementById("message");
+  message.textContent = text;
+  message.style.display = "block";
+
+  clearTimeout(window.messageTimer);
+  window.messageTimer = setTimeout(() => {
+    message.style.display = "none";
+  }, 2800);
+}
+
+function statusClass(status) {
+  if (status === "Resolved") return "resolved";
+  if (status === "In Progress") return "progress";
+  return "pending";
+}
+
+function renderIssues() {
+  const query = document.getElementById("search")
+    .value.trim().toLowerCase();
+
+  const filter = document.getElementById("filter").value;
+
+  const filtered = issues.filter(issue => {
+    const matchesStatus =
+      filter === "All" || issue.status === filter;
+
+    const searchable = [
+      issue.title,
+      issue.location,
+      issue.category,
+      issue.description
+    ].join(" ").toLowerCase();
+
+    return matchesStatus && searchable.includes(query);
+  });
+
+  const container = document.getElementById("issues");
+
+  if (filtered.length === 0) {
+    container.innerHTML =
+      '<p style="padding:25px 0;color:#64748b;text-align:center">' +
+      'No issues found. Try a different search or filter.</p>';
+  } else {
+    container.innerHTML = filtered.map(issue => `
+      <article class="issue">
+        <h3>${safeText(issue.title)}</h3>
+        <p>${safeText(issue.description)}</p>
+
+        <div class="issue-info">
+          <span style="font-size:13px;color:#64748b">
+            📍 ${safeText(issue.location)}
+          </span>
+          <span class="badge ${statusClass(issue.status)}">
+            ${safeText(issue.status)}
+          </span>
+        </div>
+
+        <div class="issue-info">
+          <span class="badge">${safeText(issue.category)}</span>
+          <span class="badge ${issue.priority === "Urgent" ? "priority" : ""}">
+            ${safeText(issue.priority)} Priority
+          </span>
+
+          ${issue.status !== "Resolved" ? `
+            <button class="update-btn"
+              onclick="updateStatus(${issue.id})">
+              Update Status
+            </button>
+          ` : ""}
+        </div>
+      </article>
+    `).join("");
+  }
+
+  updateStats();
+}
+
+function updateStats() {
+  const total = issues.length;
+  const resolved = issues.filter(
+    issue => issue.status === "Resolved"
+  ).length;
+
+  const progress = issues.filter(
+    issue => issue.status === "In Progress"
+  ).length;
+
+  const pending = issues.filter(
+    issue => issue.status === "Pending"
+  ).length;
+
+  document.getElementById("total").textContent = total;
+  document.getElementById("resolved").textContent = resolved;
+  document.getElementById("inProgress").textContent = progress;
+  document.getElementById("pending").textContent = pending;
+
+  const rate = total ? Math.round(resolved / total * 100) : 0;
+  document.getElementById("bar").style.width = rate + "%";
+  document.getElementById("rate").textContent = rate + "% resolved";
+}
+
+function updateStatus(id) {
+  const issue = issues.find(item => item.id === id);
+  if (!issue) return;
+
+  if (issue.status === "Pending") {
+    issue.status = "In Progress";
+  } else if (issue.status === "In Progress") {
+    issue.status = "Resolved";
+  }
+
+  renderIssues();
+  showMessage("Issue status updated to " + issue.status + ".");
+}
+
+document.getElementById("issueForm").addEventListener(
+  "submit",
+  function(event) {
+    event.preventDefault();
+
+    const title = document.getElementById("title").value.trim();
+    const category = document.getElementById("category").value;
+    const priority = document.getElementById("priority").value;
+    const location = document.getElementById("location").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const reporter = document.getElementById("reporter").value.trim();
+
+    if (!title || !category || !location || !description) {
+      showMessage("Please complete all required fields.");
+      return;
+    }
+
+    issues.unshift({
+      id: Date.now(),
+      title,
+      category,
+      priority,
+      location,
+      description,
+      reporter: reporter || "Community Member",
+      status: "Pending"
+    });
+
+    this.reset();
+    closeForm();
+
+    document.getElementById("search").value = "";
+    document.getElementById("filter").value = "All";
+
+    renderIssues();
+    showMessage("Your issue has been reported successfully!");
+    window.scrollTo({top: 0, behavior: "smooth"});
+  }
+);
+
+document.getElementById("modal").addEventListener("click", function(event) {
+  if (event.target === this) closeForm();
+});
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") closeForm();
+});
+
+renderIssues();
+</script>
+
+</body>
+</html>
